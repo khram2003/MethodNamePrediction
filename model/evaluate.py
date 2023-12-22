@@ -6,7 +6,7 @@ from torchmetrics import BLEUScore
 
 from dataset.dataset import MethodNameDataset
 
-checkpoint = "Salesforce/codet5-base"
+checkpoint = "Salesforce/codet5p-110m-embedding"
 device = "cuda" if torch.cuda.is_available() else "cpu"
 tokenizer = AutoTokenizer.from_pretrained(checkpoint)
 model = T5ForConditionalGeneration.from_pretrained(checkpoint).to(device)
