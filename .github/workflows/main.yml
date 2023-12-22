@@ -1,0 +1,30 @@
+name: Auto Pull on Remote Machine
+
+on:
+  push:
+    branches:
+      - server
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 -d > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan 34.16.177.159 >> ~/.ssh/known_hosts
+
+    - name: Pull code on remote server
+      run: ssh -vvv -i ~/.ssh/id_rsa nikita_khramov@34.16.177.159 "cd /home/nikita_khramov/jb_test &&
+        git stash &&
+        git pull && 
+        source /home/nikita_khramov/jb_test/MethodNamePrediction/.venv/bin/activate &&
+        pip3 install -r /home/nikita_khramov/jb_test/MethodNamePrediction/requirements.txt &&
+        cd /home/nikita_khramov/jb_test/MethodNamePrediction/ &&
+        chmod +x /home/nikita_khramov/jb_test/MethodNamePrediction/clone.sh &&
+        ./clone.sh "
