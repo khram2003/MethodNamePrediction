@@ -21,7 +21,7 @@ def evaluate_pretrained_model():
     bleu = BLEUScore()
 
     with torch.no_grad():
-        for bodies, names in eval_loader:
+        for bodies, names in tqdm(eval_loader):
             inputs = tokenizer.encode(bodies[0], return_tensors='pt').to(device)
             outputs = model.generate(inputs, max_length=2)
             predicted_name = tokenizer.decode(outputs[0], skip_special_tokens=True)
