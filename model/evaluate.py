@@ -14,6 +14,7 @@ model = T5ForConditionalGeneration.from_pretrained(checkpoint).to(device)
 dataset = MethodNameDataset('/home/xram/Desktop/intellij-community')
 eval_loader = DataLoader(dataset, batch_size=1, shuffle=False)
 
+
 def evaluate_pretrained_model():
     model.eval()
     # accuracy = Accuracy()
@@ -30,7 +31,7 @@ def evaluate_pretrained_model():
 
     return bleu.compute()
 
+
 if __name__ == '__main__':
-    accuracy, bleu = evaluate_pretrained_model()
-    print(f'Accuracy: {accuracy}')
+    bleu = evaluate_pretrained_model()
     print(f'BLEU: {bleu}')

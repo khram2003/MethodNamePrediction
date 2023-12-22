@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Any
+from typing import List
 from torch.utils.data import Dataset
 from tqdm import tqdm
 
@@ -96,7 +96,8 @@ def get_methods_from_file(filepath: str) -> List[Method]:
             method_code = content.splitlines()[start[0]:end[0] + 1]
             method_code = '\n'.join(method_code)
             methods.append(
-                Method(node.children[1].text.decode(), method_code.replace(node.children[1].text.decode(), '<extra_id_0>', 1)))
+                Method(node.children[1].text.decode(),
+                       method_code.replace(node.children[1].text.decode(), '<extra_id_0>', 1)))
 
     return methods
 
@@ -119,8 +120,3 @@ class MethodNameDataset(Dataset):
 
     def __getitem__(self, idx):
         return self.methods[idx].body, self.methods[idx].name
-
-if __name__ == '__main__':
-    dataset = MethodNameDataset('/home/xram/Desktop/intellij-community')
-    print(len(dataset))
-    print(dataset[0][1])

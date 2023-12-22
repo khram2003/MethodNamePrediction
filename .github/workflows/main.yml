@@ -3,7 +3,7 @@ name: Auto Pull on Remote Machine
 on:
   push:
     branches:
-      - server
+      - main
 
 jobs:
   deploy:
