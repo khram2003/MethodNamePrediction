@@ -12,7 +12,7 @@ tokenizer = AutoTokenizer.from_pretrained(checkpoint)
 model = T5ForConditionalGeneration.from_pretrained(checkpoint).to(device)
 
 dataset = MethodNameDataset('../intellij-community')
-eval_loader = DataLoader(dataset, batch_size=1, shuffle=False)
+eval_loader = DataLoader(dataset, batch_size=32, shuffle=False)
 print(f'Number of samples: {len(dataset)}')
 
 def evaluate_pretrained_model():
@@ -21,15 +21,15 @@ def evaluate_pretrained_model():
     bleu = BLEUScore()
 
     with torch.no_grad():
-        for idx, (method_bodies, method_names) in enumerate(tqdm(eval_loader)):
-            inputs = tokenizer.encode(method_bodies, return_tensors="pt", padding=True, truncation=True).to(device)
+        for method_bodies, method_names in tqdm(eval_loader):
+            method_bodies = method_bodies.to(device)
+            method_names = method_names.to(device)
 
-            outputs = model.generate(**inputs)
-            predictions = tokenizer.decode(outputs, skip_special_tokens=True)
+            inputs = tokenizer(method_bodies, padding=True, truncation=True, return_tensors="pt").to(device)
+            outputs = model.generate(method_bodies, max_length=10)
+            outputs = tokenizer.batch_decode(outputs, skip_special_tokens=True)
 
-            bleu.update(preds=predictions, target=method_names)
-
-    return bleu.compute()
+            bleu.update(outputs, method_names)
 
 
 if __name__ == '__main__':
