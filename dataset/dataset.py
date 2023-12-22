@@ -11,20 +11,20 @@ Language.build_library(
     'build/my-languages.so',
 
     [
-        '../tree-sitter-kotlin',
-        '../tree-sitter-java',
-        '../tree-sitter-javascript',
+        'tree-sitter-kotlin',
+        'tree-sitter-java',
+        'tree-sitter-javascript',
         # '../tree-sitter-typescript',
-        '../tree-sitter-python',
-        '../tree-sitter-cpp',
-        '../tree-sitter-c',
+        'tree-sitter-python',
+        'tree-sitter-cpp',
+        'tree-sitter-c',
         # '../tree-sitter-c-sharp',
-        '../tree-sitter-php',
-        '../tree-sitter-go',
-        '../tree-sitter-rust',
-        '../tree-sitter-swift',
+        'tree-sitter-php',
+        'tree-sitter-go',
+        'tree-sitter-rust',
+        'tree-sitter-swift',
         # '../tree-sitter-scala',
-        '../tree-sitter-ruby'
+        'tree-sitter-ruby'
     ]
 )
 
