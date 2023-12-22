@@ -22,8 +22,8 @@ def evaluate_pretrained_model():
 
     with torch.no_grad():
         for inputs, targets in tqdm(eval_loader):
-            inputs = inputs.to(device)
-            targets = targets.to(device)
+            # inputs = inputs.to(
+            # targets = targets.to(device)
 
             outputs = model.generate(inputs, max_length=10)
             outputs = tokenizer.decode(outputs[0], skip_special_tokens=True)
