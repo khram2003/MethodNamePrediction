@@ -6,7 +6,7 @@ from torchmetrics import BLEUScore
 
 from dataset.dataset import MethodNameDataset
 
-checkpoint = "Salesforce/codet5p-110m-embedding"
+checkpoint = "Salesforce/codet5p-770m"
 device = "cuda" if torch.cuda.is_available() else "cpu"
 tokenizer = AutoTokenizer.from_pretrained(checkpoint)
 model = T5ForConditionalGeneration.from_pretrained(checkpoint).to(device)
@@ -27,7 +27,7 @@ def evaluate_pretrained_model():
                 continue
             outputs = model.generate(inputs, max_length=2)
             predicted_name = tokenizer.decode(outputs[0], skip_special_tokens=True)
-
+            print(predicted_name)
             bleu.update(predicted_name, names[0])
 
     return bleu.compute()
