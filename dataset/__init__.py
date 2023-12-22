@@ -1,1 +1,2 @@
-from dataset.dataset import MethodNameDataset
+__all__ = []
+from .dataset import MethodNameDataset
