@@ -7,12 +7,13 @@ from torchmetrics import BLEUScore
 from dataset.dataset import MethodNameDataset
 
 checkpoint = "Salesforce/codet5p-110m-embedding"
-device = "cuda" if torch.cuda.is_available() else "cpu"
+# device = "cuda" if torch.cuda.is_available() else "cpu"
+device = "cpu"
 tokenizer = AutoTokenizer.from_pretrained(checkpoint)
 model = T5ForConditionalGeneration.from_pretrained(checkpoint).to(device)
 
 dataset = MethodNameDataset('../intellij-community')
-eval_loader = DataLoader(dataset, batch_size=1, shuffle=False)
+eval_loader = DataLoader(dataset, batch_size=32, shuffle=False)
 print(f'Number of samples: {len(dataset)}')
 
 
