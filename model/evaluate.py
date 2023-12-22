@@ -4,7 +4,7 @@ from tqdm import tqdm
 from transformers import T5ForConditionalGeneration, AutoTokenizer
 from torchmetrics import BLEUScore
 
-from dataset.dataset import MethodNameDataset
+from dataset import MethodNameDataset
 
 checkpoint = "Salesforce/codet5-base"
 device = "cuda" if torch.cuda.is_available() else "cpu"
