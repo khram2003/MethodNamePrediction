@@ -13,7 +13,7 @@ model = T5ForConditionalGeneration.from_pretrained(checkpoint).to(device)
 
 dataset = MethodNameDataset('../../intellij-community')
 eval_loader = DataLoader(dataset, batch_size=1, shuffle=False)
-print(f'Number of samples: {len(dataset)}'
+print(f'Number of samples: {len(dataset)}')
 
 def evaluate_pretrained_model():
     model.eval()
