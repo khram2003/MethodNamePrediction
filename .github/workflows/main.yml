@@ -25,6 +25,4 @@ jobs:
         git pull && 
         source /home/nikita_khramov/jb_test/MethodNamePrediction/.venv/bin/activate &&
         pip3 install -r /home/nikita_khramov/jb_test/MethodNamePrediction/requirements.txt &&
-        cd /home/nikita_khramov/jb_test/MethodNamePrediction/ &&
-        chmod +x /home/nikita_khramov/jb_test/MethodNamePrediction/clone.sh &&
-        ./clone.sh "
+        cd /home/nikita_khramov/jb_test/MethodNamePrediction/"
