@@ -11,7 +11,7 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 tokenizer = AutoTokenizer.from_pretrained(checkpoint)
 model = T5ForConditionalGeneration.from_pretrained(checkpoint).to(device)
 
-dataset = MethodNameDataset('../../intellij-community')
+dataset = MethodNameDataset('../intellij-community')
 eval_loader = DataLoader(dataset, batch_size=1, shuffle=False)
 print(f'Number of samples: {len(dataset)}')
 
