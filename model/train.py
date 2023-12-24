@@ -40,7 +40,7 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
             labels = tokenizer(method_name, padding=True, truncation=True, return_tensors="pt").input_ids.to(device)
             labels[labels == tokenizer.pad_token_id] = -100
 
-            outputs = model.generate(input_ids=inputs.input_ids, attention_mask=inputs.attention_mask, labels=labels)
+            outputs = model(input_ids=inputs.input_ids, attention_mask=inputs.attention_mask, labels=labels)
             loss = outputs.loss
             total_train_loss += loss.item()
 
@@ -48,8 +48,10 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
             loss.backward()
             optimizer.step()
 
+            generated_ids = model.generate(input_ids=inputs.input_ids, attention_mask=inputs.attention_mask)
+            predicted_name = tokenizer.decode(generated_ids[0], skip_special_tokens=True)
+
             actual_names_train.append([method_name])
-            predicted_name = tokenizer.decode(outputs[0], skip_special_tokens=True)
             predicted_names_train.append(predicted_name)
 
         bleu_score_train = corpus_bleu(actual_names_train, predicted_names_train)
@@ -61,19 +63,21 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
         actual_names = []
         predicted_names = []
         with torch.no_grad():
-            for _, (method_body, method_name) in enumerate(val_loader):
+            for method_body, method_name in tqdm(val_loader):
                 inputs = tokenizer(method_body, padding=True, truncation=True,
                                    return_tensors="pt").to(device)
                 labels = tokenizer(method_name, padding=True, truncation=True, return_tensors="pt").input_ids.to(device)
                 labels[labels == tokenizer.pad_token_id] = -100
 
-                outputs = model.generate(input_ids=inputs.input_ids, attention_mask=inputs.attention_mask, labels=labels)
+                outputs = model(input_ids=inputs.input_ids, attention_mask=inputs.attention_mask, labels=labels)
                 loss = outputs.loss
                 total_loss += loss.item()
 
-                actual_names.append([method_name])
-                predicted_name = tokenizer.decode(outputs[0], skip_special_tokens=True)
-                predicted_names.append(predicted_name)
+                generated_ids = model.generate(input_ids=inputs.input_ids, attention_mask=inputs.attention_mask)
+                predicted_name = tokenizer.decode(generated_ids[0], skip_special_tokens=True)
+
+                actual_names_train.append([method_name])
+                predicted_names_train.append(predicted_name)
 
         avg_val_loss = total_loss / len(val_loader)
         chencherry = SmoothingFunction()
