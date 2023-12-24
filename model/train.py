@@ -21,8 +21,8 @@ train_subset = torch.utils.data.Subset(train_dataset, range(subset_size))
 
 eval_dataset = MethodNameDataset(eval_methods)
 
-train_loader = DataLoader(train_subset, batch_size=1, shuffle=True)
-eval_loader = DataLoader(eval_dataset, batch_size=1, shuffle=False)
+train_loader = DataLoader(train_subset, batch_size=4, shuffle=True)
+eval_loader = DataLoader(eval_dataset, batch_size=4, shuffle=False)
 
 optimizer = AdamW(model.parameters(), lr=5e-5)
 
@@ -55,8 +55,8 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
             actual_names_train.append([method_name])
             predicted_names_train.append(predicted_name)
 
-        chencherry = SmoothingFunction()
-        bleu_score_train = corpus_bleu(actual_names_train, predicted_names_train, smoothing_function=chencherry)
+        # chencherry = SmoothingFunction()
+        bleu_score_train = corpus_bleu(actual_names_train, predicted_names_train)
         accuracy_train = accuracy_score([name[0] for name in actual_names_train], predicted_names_train)
 
         avg_train_loss = total_train_loss / len(train_loader)
@@ -83,8 +83,9 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
                 predicted_names_train.append(predicted_name)
 
         avg_val_loss = total_loss / len(val_loader)
-        chencherry = SmoothingFunction()
-        bleu_score_val = corpus_bleu(actual_names, predicted_names, smoothing_function=chencherry)
+        # chencherry = Smooth
+        # bleu = evaluate.load('bleu')
+        bleu_score_val = corpus_bleu(actual_names, predicted_names)
         accuracy_val = accuracy_score([name[0] for name in actual_names], predicted_names)
 
         wandb.log({"train_loss": avg_train_loss, "val_loss": avg_val_loss, "train_bleu": bleu_score_train,
