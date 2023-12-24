@@ -6,7 +6,7 @@ import torch
 from dataset.dataset import MethodNameDataset
 from dataset.utils import get_methods_split
 
-checkpoint = "Salesforce/codet5p-770m"
+checkpoint = "Salesforce/codet5p-220m"
 device = "cuda" if torch.cuda.is_available() else "cpu"
 tokenizer = AutoTokenizer.from_pretrained(checkpoint)
 model = T5ForConditionalGeneration.from_pretrained(checkpoint).to(device)
