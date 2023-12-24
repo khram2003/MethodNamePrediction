@@ -48,13 +48,15 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
             loss.backward()
             optimizer.step()
 
-            generated_ids = model.generate(input_ids=inputs.input_ids, attention_mask=inputs.attention_mask)
+            generated_ids = model.generate(input_ids=inputs.input_ids, attention_mask=inputs.attention_mask,
+                                           max_new_tokens=7)
             predicted_name = tokenizer.decode(generated_ids[0], skip_special_tokens=True)
 
             actual_names_train.append([method_name])
             predicted_names_train.append(predicted_name)
 
-        bleu_score_train = corpus_bleu(actual_names_train, predicted_names_train)
+        chencherry = SmoothingFunction()
+        bleu_score_train = corpus_bleu(actual_names_train, predicted_names_train, smoothing_function=chencherry)
         accuracy_train = accuracy_score([name[0] for name in actual_names_train], predicted_names_train)
 
         avg_train_loss = total_train_loss / len(train_loader)
@@ -73,7 +75,8 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
                 loss = outputs.loss
                 total_loss += loss.item()
 
-                generated_ids = model.generate(input_ids=inputs.input_ids, attention_mask=inputs.attention_mask)
+                generated_ids = model.generate(input_ids=inputs.input_ids, attention_mask=inputs.attention_mask,
+                                               max_new_tokens=7)
                 predicted_name = tokenizer.decode(generated_ids[0], skip_special_tokens=True)
 
                 actual_names_train.append([method_name])

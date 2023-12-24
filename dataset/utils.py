@@ -11,7 +11,7 @@ Language.build_library(
     'build/my-languages.so',
 
     [
-        'tree-sitter-kotlin',
+        # 'tree-sitter-kotlin',
         'tree-sitter-java',
         'tree-sitter-javascript',
         # '../tree-sitter-typescript',
@@ -21,15 +21,15 @@ Language.build_library(
         # '../tree-sitter-c-sharp',
         'tree-sitter-php',
         'tree-sitter-go',
-        'tree-sitter-rust',
-        'tree-sitter-swift',
+        # 'tree-sitter-rust',
+        # 'tree-sitter-swift',
         # '../tree-sitter-scala',
         'tree-sitter-ruby'
     ]
 )
 
 JAVA_LANGUAGE = Language('build/my-languages.so', 'java')
-KOTLIN_LANGUAGE = Language('build/my-languages.so', 'kotlin')
+# KOTLIN_LANGUAGE = Language('build/my-languages.so', 'kotlin')
 JAVASCRIPT_LANGUAGE = Language('build/my-languages.so', 'javascript')
 # TYPESCRIPT_LANGUAGE = Language('build/my-languages.so', 'typescript')
 PYTHON_LANGUAGE = Language('build/my-languages.so', 'python')
@@ -38,14 +38,14 @@ C_LANGUAGE = Language('build/my-languages.so', 'c')
 # C_SHARP_LANGUAGE = Language('build/my-languages.so', 'c_sharp')
 PHP_LANGUAGE = Language('build/my-languages.so', 'php')
 GO_LANGUAGE = Language('build/my-languages.so', 'go')
-RUST_LANGUAGE = Language('build/my-languages.so', 'rust')
-SWIFT_LANGUAGE = Language('build/my-languages.so', 'swift')
+# RUST_LANGUAGE = Language('build/my-languages.so', 'rust')
+# SWIFT_LANGUAGE = Language('build/my-languages.so', 'swift')
 # SCALA_LANGUAGE = Language('build/my-languages.so', 'scala')
 RUBY_LANGUAGE = Language('build/my-languages.so', 'ruby')
 
 PARSERS = {
     'java': Parser(),
-    'kt': Parser(),
+    # 'kt': Parser(),
     'js': Parser(),
     # 'ts': Parser(),
     'py': Parser(),
@@ -54,14 +54,14 @@ PARSERS = {
     # 'cs': Parser(),
     'php': Parser(),
     'go': Parser(),
-    'rs': Parser(),
-    'swift': Parser(),
+    # 'rs': Parser(),
+    # 'swift': Parser(),
     # 'scala': Parser(),
     'rb': Parser()
 }
 
 PARSERS['java'].set_language(JAVA_LANGUAGE)
-PARSERS['kt'].set_language(KOTLIN_LANGUAGE)
+# PARSERS['kt'].set_language(KOTLIN_LANGUAGE)
 PARSERS['js'].set_language(JAVASCRIPT_LANGUAGE)
 # PARSERS['ts'].set_language(TYPESCRIPT_LANGUAGE)
 PARSERS['py'].set_language(PYTHON_LANGUAGE)
@@ -70,7 +70,7 @@ PARSERS['c'].set_language(C_LANGUAGE)
 # PARSERS['cs'].set_language(C_SHARP_LANGUAGE)
 PARSERS['php'].set_language(PHP_LANGUAGE)
 PARSERS['go'].set_language(GO_LANGUAGE)
-PARSERS['rs'].set_language(RUST_LANGUAGE)
+# PARSERS['rs'].set_language(RUST_LANGUAGE)
 # PARSERS['swift'].set_language(SWIFT_LANGUAGE)
 # PARSERS['scala'].set_language(SCALA_LANGUAGE)
 PARSERS['rb'].set_language(RUBY_LANGUAGE)
@@ -86,10 +86,10 @@ def get_code_filenames_from_directory(directory: str) -> List[str]:
     filenames = []
     for root, dirs, files in os.walk(directory):
         for file in files:
-            if file.endswith(".kt") or file.endswith(".java") or file.endswith(".js") or file.endswith(
+            if file.endswith(".java") or file.endswith(".js") or file.endswith(
                     ".py") or file.endswith(".cpp") \
                     or file.endswith(".c") or file.endswith(".php") or file.endswith(
-                ".go") or file.endswith(".rs") \
+                ".go") \
                     or file.endswith('rb'):
                 filenames.append(os.path.join(root, file))
     return filenames
