@@ -15,8 +15,8 @@ train_methods, eval_methods = get_methods_split('../intellij-community')
 train_dataset = MethodNameDataset(train_methods)
 eval_dataset = MethodNameDataset(eval_methods)
 
-train_loader = DataLoader(train_dataset, batch_size=1, shuffle=True)
-eval_loader = DataLoader(eval_dataset, batch_size=1, shuffle=False)
+train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+eval_loader = DataLoader(eval_dataset, batch_size=32, shuffle=False)
 
 optimizer = AdamW(model.parameters(), lr=5e-5)
 
@@ -43,7 +43,7 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
         model.train()
         total_train_loss = 0
         print(f"Epoch: {epoch}")
-        for _, (method_body, method_name) in tqdm(enumerate(train_loader)):
+        for (method_body, method_name) in tqdm(train_loader):
             inputs = tokenizer(method_body, padding=True, truncation=True, return_tensors="pt").to(device)
             labels = tokenizer(method_name, padding=True, truncation=True, return_tensors="pt").input_ids.to(device)
             labels[labels == tokenizer.pad_token_id] = -100
