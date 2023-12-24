@@ -16,7 +16,7 @@ model = T5ForConditionalGeneration.from_pretrained(checkpoint).to(device)
 
 train_methods, eval_methods = get_methods_split('../intellij-community')
 train_dataset = MethodNameDataset(train_methods)
-subset_size = int(0.01 * len(train_dataset))
+subset_size = int(len(train_dataset))
 train_subset = torch.utils.data.Subset(train_dataset, range(subset_size))
 
 eval_dataset = MethodNameDataset(eval_methods)
@@ -55,8 +55,6 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
             actual_names_train.append([method_name])
             predicted_names_train.append(predicted_name)
 
-        print(predicted_names_train)
-
         chencherry = SmoothingFunction()
         bleu_score_train = corpus_bleu(actual_names_train, predicted_names_train, smoothing_function=chencherry.method1)
         accuracy_train = accuracy_score([name[0] for name in actual_names_train], predicted_names_train)
@@ -85,7 +83,6 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
                 predicted_names.append(predicted_name)
 
         avg_val_loss = total_loss / len(val_loader)
-        print(predicted_names)
         chencherry = SmoothingFunction()
         bleu_score_val = corpus_bleu(actual_names, predicted_names, smoothing_function=chencherry.method1)
         accuracy_val = accuracy_score([name[0] for name in actual_names], predicted_names)
@@ -94,4 +91,4 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
                    "val_bleu": bleu_score_val, "train_accuracy": accuracy_train, "val_accuracy": accuracy_val})
 
 
-train_and_evaluate(1, tokenizer, model, device, train_loader, eval_loader, optimizer)
+train_and_evaluate(20, tokenizer, model, device, train_loader, eval_loader, optimizer)
