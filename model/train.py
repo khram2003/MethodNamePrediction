@@ -15,8 +15,8 @@ train_methods, eval_methods = get_methods_split('../intellij-community')
 train_dataset = MethodNameDataset(train_methods)
 eval_dataset = MethodNameDataset(eval_methods)
 
-train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
-eval_loader = DataLoader(eval_dataset, batch_size=16, shuffle=False)
+train_loader = DataLoader(train_dataset, batch_size=1, shuffle=True)
+eval_loader = DataLoader(eval_dataset, batch_size=1, shuffle=False)
 
 optimizer = AdamW(model.parameters(), lr=5e-5)
 
@@ -26,7 +26,7 @@ def evaluate(tokenizer, model, device, loader):
     total_loss = 0
     with torch.no_grad():
         for _, (method_body, method_name) in enumerate(loader):
-            inputs = tokenizer("predict method name: " + method_body, padding=True, truncation=True,
+            inputs = tokenizer(method_body, padding=True, truncation=True,
                                return_tensors="pt").to(device)
             labels = tokenizer(method_name, padding=True, truncation=True, return_tensors="pt").input_ids.to(device)
             labels[labels == tokenizer.pad_token_id] = -100
