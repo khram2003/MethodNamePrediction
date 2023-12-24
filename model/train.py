@@ -13,9 +13,12 @@ model = T5ForConditionalGeneration.from_pretrained(checkpoint).to(device)
 
 train_methods, eval_methods = get_methods_split('../intellij-community')
 train_dataset = MethodNameDataset(train_methods)
+subset_size = int(0.5 * len(train_dataset))
+train_subset = torch.utils.data.Subset(train_dataset, range(subset_size))
+
 eval_dataset = MethodNameDataset(eval_methods)
 
-train_loader = DataLoader(train_dataset, batch_size=1, shuffle=True)
+train_loader = DataLoader(train_subset, batch_size=1, shuffle=True)
 eval_loader = DataLoader(eval_dataset, batch_size=1, shuffle=False)
 
 optimizer = AdamW(model.parameters(), lr=5e-5)
