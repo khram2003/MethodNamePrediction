@@ -81,8 +81,8 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
                                                max_new_tokens=7)
                 predicted_name = tokenizer.decode(generated_ids[0], skip_special_tokens=True)
 
-                actual_names_train.append([method_name])
-                predicted_names_train.append(predicted_name)
+                actual_names.append([method_name])
+                predicted_names.append(predicted_name)
 
         avg_val_loss = total_loss / len(val_loader)
         print(predicted_names)
