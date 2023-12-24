@@ -27,23 +27,6 @@ eval_loader = DataLoader(eval_dataset, batch_size=1, shuffle=False)
 optimizer = AdamW(model.parameters(), lr=5e-5)
 
 
-def evaluate(tokenizer, model, device, loader):
-    model.eval()
-    total_loss = 0
-    with torch.no_grad():
-        for _, (method_body, method_name) in enumerate(loader):
-            inputs = tokenizer(method_body, padding=True, truncation=True,
-                               return_tensors="pt").to(device)
-            labels = tokenizer(method_name, padding=True, truncation=True, return_tensors="pt").input_ids.to(device)
-            labels[labels == tokenizer.pad_token_id] = -100
-
-            outputs = model(input_ids=inputs.input_ids, attention_mask=inputs.attention_mask, labels=labels)
-            loss = outputs.loss
-            total_loss += loss.item()
-
-    return total_loss / len(loader)
-
-
 def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_loader, optimizer):
     wandb.init(project="MethodName")
     for epoch in range(num_epochs):
@@ -57,7 +40,7 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
             labels = tokenizer(method_name, padding=True, truncation=True, return_tensors="pt").input_ids.to(device)
             labels[labels == tokenizer.pad_token_id] = -100
 
-            outputs = model(input_ids=inputs.input_ids, attention_mask=inputs.attention_mask, labels=labels)
+            outputs = model.generate(input_ids=inputs.input_ids, attention_mask=inputs.attention_mask, labels=labels)
             loss = outputs.loss
             total_train_loss += loss.item()
 
@@ -84,7 +67,7 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
                 labels = tokenizer(method_name, padding=True, truncation=True, return_tensors="pt").input_ids.to(device)
                 labels[labels == tokenizer.pad_token_id] = -100
 
-                outputs = model(input_ids=inputs.input_ids, attention_mask=inputs.attention_mask, labels=labels)
+                outputs = model.generate(input_ids=inputs.input_ids, attention_mask=inputs.attention_mask, labels=labels)
                 loss = outputs.loss
                 total_loss += loss.item()
 
