@@ -23,12 +23,14 @@ predicted_names = []
 
 def predict_method_name(body):
     inputs = tokenizer.encode(body, return_tensors='pt').to(device)
+    if inputs[0].shape[0] > 512:
+        inputs = inputs[:, :512]
     outputs = model.generate(inputs, max_length=10)
     predicted_name = tokenizer.decode(outputs[0], skip_special_tokens=True)
     return predicted_name
 
 
-for method_body, actual_name in eval_loader:
+for method_body, actual_name in tqdm(eval_loader):
     predicted_name = predict_method_name(method_body[0])
     actual_names.append([actual_name])
     predicted_names.append(predicted_name)
