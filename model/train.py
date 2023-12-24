@@ -1,5 +1,6 @@
 from torch.optim import AdamW
 from torch.utils.data import DataLoader
+from tqdm import tqdm
 from transformers import T5ForConditionalGeneration, AutoTokenizer
 import torch
 from dataset.dataset import MethodNameDataset
@@ -41,7 +42,8 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
     for epoch in range(num_epochs):
         model.train()
         total_train_loss = 0
-        for _, (method_body, method_name) in enumerate(train_loader):
+        print(f"Epoch: {epoch}")
+        for _, (method_body, method_name) in tqdm(enumerate(train_loader)):
             inputs = tokenizer(method_body, padding=True, truncation=True, return_tensors="pt").to(device)
             labels = tokenizer(method_name, padding=True, truncation=True, return_tensors="pt").input_ids.to(device)
             labels[labels == tokenizer.pad_token_id] = -100
