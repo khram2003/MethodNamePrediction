@@ -54,7 +54,7 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
             loss.backward()
             optimizer.step()
 
-            print(f"Epoch: {epoch}, Loss: {loss.item()}")
+            # print(f"Epoch: {epoch}, Loss: {loss.item()}")
 
         avg_train_loss = total_train_loss / len(train_loader)
         avg_val_loss = evaluate(tokenizer, model, device, val_loader)
