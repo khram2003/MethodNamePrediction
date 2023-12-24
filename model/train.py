@@ -15,8 +15,8 @@ train_methods, eval_methods = get_methods_split('../intellij-community')
 train_dataset = MethodNameDataset(train_methods)
 eval_dataset = MethodNameDataset(eval_methods)
 
-train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
-eval_loader = DataLoader(eval_dataset, batch_size=32, shuffle=False)
+train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
+eval_loader = DataLoader(eval_dataset, batch_size=16, shuffle=False)
 
 optimizer = AdamW(model.parameters(), lr=5e-5)
 
