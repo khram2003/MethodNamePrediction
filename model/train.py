@@ -1,4 +1,4 @@
-from torch.optim import AdamW
+from torch.optim import Adam
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from transformers import T5ForConditionalGeneration, AutoTokenizer
@@ -16,15 +16,19 @@ model = T5ForConditionalGeneration.from_pretrained(checkpoint).to(device)
 
 train_methods, eval_methods = get_methods_split('../intellij-community')
 train_dataset = MethodNameDataset(train_methods)
-subset_size = int(len(train_dataset))
+subset_size = int(0.1*len(train_dataset))
+
 train_subset = torch.utils.data.Subset(train_dataset, range(subset_size))
 
 eval_dataset = MethodNameDataset(eval_methods)
+subset_size_eval = int(0.1*len(eval_dataset))
+eval_dataset = torch.utils.data.Subset(eval_dataset, range(subset_size_eval))
 
-train_loader = DataLoader(train_subset, batch_size=1, shuffle=True)
-eval_loader = DataLoader(eval_dataset, batch_size=1, shuffle=False)
 
-optimizer = AdamW(model.parameters(), lr=5e-5)
+train_loader = DataLoader(train_subset, batch_size=8, shuffle=True)
+eval_loader = DataLoader(eval_dataset, batch_size=8, shuffle=False)
+
+optimizer = Adam(model.parameters(), lr=1e-5)
 
 
 def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_loader, optimizer):
@@ -41,6 +45,7 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
             labels[labels == tokenizer.pad_token_id] = -100
 
             outputs = model(input_ids=inputs.input_ids, attention_mask=inputs.attention_mask, labels=labels)
+            print(outputs)
             loss = outputs.loss
             total_train_loss += loss.item()
 
@@ -58,8 +63,8 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
         chencherry = SmoothingFunction()
         bleu_score_train = corpus_bleu(actual_names_train, predicted_names_train, smoothing_function=chencherry.method1)
         accuracy_train = accuracy_score([name[0] for name in actual_names_train], predicted_names_train)
-
         avg_train_loss = total_train_loss / len(train_loader)
+
         model.eval()
         total_loss = 0
         actual_names = []
@@ -91,4 +96,4 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
                    "val_bleu": bleu_score_val, "train_accuracy": accuracy_train, "val_accuracy": accuracy_val})
 
 
-train_and_evaluate(20, tokenizer, model, device, train_loader, eval_loader, optimizer)
+train_and_evaluate(7, tokenizer, model, device, train_loader, eval_loader, optimizer)
