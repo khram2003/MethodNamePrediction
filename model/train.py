@@ -45,7 +45,7 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
             labels[labels == tokenizer.pad_token_id] = -100
 
             outputs = model(input_ids=inputs.input_ids, attention_mask=inputs.attention_mask, labels=labels)
-            print(outputs)
+            # print(outputs)
             loss = outputs.loss
             total_train_loss += loss.item()
 
@@ -57,7 +57,7 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
                                            max_new_tokens=7)
             predicted_name = tokenizer.decode(generated_ids[0], skip_special_tokens=True)
 
-            actual_names_train.append([method_name])
+            actual_names_train.append(method_name)
             predicted_names_train.append(predicted_name)
 
         chencherry = SmoothingFunction()
@@ -84,7 +84,7 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
                                                max_new_tokens=7)
                 predicted_name = tokenizer.decode(generated_ids[0], skip_special_tokens=True)
 
-                actual_names.append([method_name])
+                actual_names.append(method_name)
                 predicted_names.append(predicted_name)
 
         avg_val_loss = total_loss / len(val_loader)
