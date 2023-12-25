@@ -27,7 +27,7 @@ eval_dataset = torch.utils.data.Subset(eval_dataset, range(subset_size_eval))
 train_loader = DataLoader(train_subset, batch_size=8, shuffle=True)
 eval_loader = DataLoader(eval_dataset, batch_size=8, shuffle=False)
 
-optimizer = Adam(model.parameters(), lr=1e-5)
+optimizer = Adam(model.parameters(), lr=1e-8)
 
 
 def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_loader, optimizer):
@@ -53,24 +53,22 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
             optimizer.step()
 
             generated_ids = model.generate(input_ids=inputs.input_ids, attention_mask=inputs.attention_mask,
-                                           max_new_tokens=7)
-            predicted_name = tokenizer.decode(generated_ids, skip_special_tokens=True)
+                                           max_new_tokens=3)
+            predicted_names = [tokenizer.decode(g, skip_special_tokens=True) for g in generated_ids]
 
-            print(f"Actual name: {method_name}")
-            print(f"Predicted name: {predicted_name}")
 
-            actual_names_train += method_name
-            predicted_names_train += predicted_name
+            actual_names_train += list(method_name)
+            predicted_names_train += predicted_names
 
         chencherry = SmoothingFunction()
         bleu_score_train = corpus_bleu(actual_names_train, predicted_names_train, smoothing_function=chencherry.method1)
-        accuracy_train = accuracy_score([name[0] for name in actual_names_train], predicted_names_train)
+        accuracy_train = accuracy_score(actual_names_train, predicted_names_train)
         avg_train_loss = total_train_loss / len(train_loader)
 
         model.eval()
         total_loss = 0
-        actual_names = []
-        predicted_names = []
+        actual_names_val = []
+        predicted_names_val = []
         with torch.no_grad():
             for method_body, method_name in tqdm(val_loader):
                 inputs = tokenizer(method_body, padding=True, truncation=True,
@@ -83,16 +81,16 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
                 total_loss += loss.item()
 
                 generated_ids = model.generate(input_ids=inputs.input_ids, attention_mask=inputs.attention_mask,
-                                               max_new_tokens=7)
-                predicted_name = tokenizer.decode(generated_ids, skip_special_tokens=True)
+                                               max_new_tokens=3)
+                predicted_names = [tokenizer.decode(g, skip_special_tokens=True) for g in generated_ids]
 
-                actual_names += method_name
-                predicted_names += predicted_name
+                actual_names_val += list(method_name)
+                predicted_names_val += predicted_names
 
         avg_val_loss = total_loss / len(val_loader)
         chencherry = SmoothingFunction()
-        bleu_score_val = corpus_bleu(actual_names, predicted_names, smoothing_function=chencherry.method1)
-        accuracy_val = accuracy_score(actual_names, predicted_names)
+        bleu_score_val = corpus_bleu(actual_names_val, predicted_names_val, smoothing_function=chencherry.method1)
+        accuracy_val = accuracy_score(actual_names_val, predicted_names_val)
 
         wandb.log({"train_loss": avg_train_loss, "val_loss": avg_val_loss, "train_bleu": bleu_score_train,
                    "val_bleu": bleu_score_val, "train_accuracy": accuracy_train, "val_accuracy": accuracy_val})
