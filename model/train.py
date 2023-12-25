@@ -16,14 +16,13 @@ model = T5ForConditionalGeneration.from_pretrained(checkpoint).to(device)
 
 train_methods, eval_methods = get_methods_split('../intellij-community')
 train_dataset = MethodNameDataset(train_methods)
-subset_size = int(0.1*len(train_dataset))
+subset_size = int(0.1 * len(train_dataset))
 
 train_subset = torch.utils.data.Subset(train_dataset, range(subset_size))
 
 eval_dataset = MethodNameDataset(eval_methods)
-subset_size_eval = int(0.1*len(eval_dataset))
+subset_size_eval = int(0.1 * len(eval_dataset))
 eval_dataset = torch.utils.data.Subset(eval_dataset, range(subset_size_eval))
-
 
 train_loader = DataLoader(train_subset, batch_size=8, shuffle=True)
 eval_loader = DataLoader(eval_dataset, batch_size=8, shuffle=False)
@@ -55,10 +54,13 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
 
             generated_ids = model.generate(input_ids=inputs.input_ids, attention_mask=inputs.attention_mask,
                                            max_new_tokens=7)
-            predicted_name = tokenizer.decode(generated_ids[0], skip_special_tokens=True)
+            predicted_name = tokenizer.decode(generated_ids, skip_special_tokens=True)
 
-            actual_names_train.append(method_name)
-            predicted_names_train.append(predicted_name)
+            print(f"Actual name: {method_name}")
+            print(f"Predicted name: {predicted_name}")
+
+            actual_names_train += method_name
+            predicted_names_train += predicted_name
 
         chencherry = SmoothingFunction()
         bleu_score_train = corpus_bleu(actual_names_train, predicted_names_train, smoothing_function=chencherry.method1)
@@ -82,15 +84,15 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
 
                 generated_ids = model.generate(input_ids=inputs.input_ids, attention_mask=inputs.attention_mask,
                                                max_new_tokens=7)
-                predicted_name = tokenizer.decode(generated_ids[0], skip_special_tokens=True)
+                predicted_name = tokenizer.decode(generated_ids, skip_special_tokens=True)
 
-                actual_names.append(method_name)
-                predicted_names.append(predicted_name)
+                actual_names += method_name
+                predicted_names += predicted_name
 
         avg_val_loss = total_loss / len(val_loader)
         chencherry = SmoothingFunction()
         bleu_score_val = corpus_bleu(actual_names, predicted_names, smoothing_function=chencherry.method1)
-        accuracy_val = accuracy_score([name[0] for name in actual_names], predicted_names)
+        accuracy_val = accuracy_score(actual_names, predicted_names)
 
         wandb.log({"train_loss": avg_train_loss, "val_loss": avg_val_loss, "train_bleu": bleu_score_train,
                    "val_bleu": bleu_score_val, "train_accuracy": accuracy_train, "val_accuracy": accuracy_val})
