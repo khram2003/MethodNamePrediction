@@ -17,12 +17,12 @@ model = T5ForConditionalGeneration.from_pretrained(checkpoint).to(device)
 
 train_methods, eval_methods = get_methods_split('../intellij-community')
 train_dataset = MethodNameDataset(train_methods)
-subset_size = int(0.1 * len(train_dataset))
+subset_size = int(len(train_dataset))
 
 train_subset = torch.utils.data.Subset(train_dataset, range(subset_size))
 
 eval_dataset = MethodNameDataset(eval_methods)
-subset_size_eval = int(0.1 * len(eval_dataset))
+subset_size_eval = int(len(eval_dataset))
 eval_dataset = torch.utils.data.Subset(eval_dataset, range(subset_size_eval))
 
 train_loader = DataLoader(train_subset, batch_size=8, shuffle=True)
@@ -121,4 +121,4 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
         #            "val_bleu": bleu_score_val, "train_accuracy": accuracy_train, "val_accuracy": accuracy_val})
 
 
-train_and_evaluate(20, tokenizer, model, device, train_loader, eval_loader, optimizer)
+train_and_evaluate(30, tokenizer, model, device, train_loader, eval_loader, optimizer)
