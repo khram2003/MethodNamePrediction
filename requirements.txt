@@ -31,3 +31,4 @@ torchmetrics~=1.2.1
 nltk~=3.8.1
 scikit-learn~=1.3.2
 wandb~=0.16.1
+Levenshtein~=0.23.0

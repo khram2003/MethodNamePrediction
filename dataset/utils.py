@@ -128,8 +128,9 @@ def get_all_methods(directory: str) -> List[Method]:
     return methods
 
 
-def get_methods_split(directory: str) -> Tuple[List[Method], List[Method]]:
+def get_methods_split(directory: str) -> Tuple[List[Method], List[Method], List[Method]]:
     methods = get_all_methods(directory)
     random.shuffle(methods)
-    train_methods, val_methods = train_test_split(methods, test_size=0.15, random_state=42)
-    return train_methods, val_methods
+    train_methods, val_test_methods = train_test_split(methods, test_size=0.2, random_state=42)
+    val_methods, test_methods = train_test_split(val_test_methods, test_size=0.25, random_state=42)
+    return train_methods, val_methods, test_methods
