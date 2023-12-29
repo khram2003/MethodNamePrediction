@@ -1,3 +1,5 @@
+import argparse
+
 from torch.optim import Adam
 from torch.utils.data import DataLoader
 from tqdm import tqdm
@@ -17,9 +19,9 @@ def iou_score(pred: str, truth: str):
     return len(intersection) / len(union)
 
 
-def test(trained, model, test_loader, tokenizer, device):
+def test(trained, model, test_loader, tokenizer, device, ckpt):
     if trained:
-        model.load_state_dict(torch.load('model.pth'))
+        model.load_state_dict(torch.load(ckpt))
     model.eval()
     actual_names_test = []
     predicted_names_test = []
@@ -135,12 +137,22 @@ def train_and_evaluate(num_epochs, tokenizer, model, device, train_loader, val_l
 
 
 if __name__ == '__main__':
-    checkpoint = "Salesforce/codet5p-220m"
+    parser = argparse.ArgumentParser(description='Train and Evaluate Method Name Prediction Model')
+    parser.add_argument('--eval_mode', type=bool, default=False, help='Set to True for evaluation mode')
+    parser.add_argument('--num_epochs', type=int, default=25, help='Number of epochs for training')
+    parser.add_argument('--batch_size', type=int, default=8, help='Batch size for training')
+    parser.add_argument('--fine_tuned', type=str, default='', help='Path to fine-tuned model for evaluation')
+    parser.add_argument('--data_path', type=str, default='../intellij-community', help='Path to code directory')
+    parser.add_argument('--ckpt', type=str, default='Salesforce/codet5p-220m', help='Pre-trained checkpoint')
+
+    args = parser.parse_args()
+
+    checkpoint = args.ckpt
     device = "cuda" if torch.cuda.is_available() else "cpu"
     tokenizer = AutoTokenizer.from_pretrained(checkpoint)
     model = T5ForConditionalGeneration.from_pretrained(checkpoint).to(device)
 
-    train_methods, eval_methods, test_methods = get_methods_split('../intellij-community')
+    train_methods, eval_methods, test_methods = get_methods_split(args.data_path)
     train_dataset = MethodNameDataset(train_methods)
     subset_size = int(len(train_dataset))
 
@@ -152,11 +164,20 @@ if __name__ == '__main__':
 
     test_dataset = MethodNameDataset(test_methods)
 
-    train_loader = DataLoader(train_subset, batch_size=8, shuffle=True)
-    eval_loader = DataLoader(eval_dataset, batch_size=8, shuffle=False)
-    test_loader = DataLoader(test_dataset, batch_size=8, shuffle=False)
+    train_loader = DataLoader(train_subset, batch_size=args.batch_size, shuffle=True)
+    eval_loader = DataLoader(eval_dataset, batch_size=args.batch_size, shuffle=False)
+    test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False)
 
     optimizer = Adam(model.parameters(), lr=1e-6)
-    test(trained=False, model=model, test_loader=test_loader, tokenizer=tokenizer, device=device)
-    train_and_evaluate(25, tokenizer, model, device, train_loader, eval_loader, optimizer)
-    test(trained=True, model=model, test_loader=test_loader, tokenizer=tokenizer, device=device)
+
+    if args.eval_mode:
+        if args.fine_tuned != '':
+            model.load_state_dict(torch.load(args.fine_tuned))
+            test(trained=False, model=model, test_loader=test_loader, tokenizer=tokenizer, device=device,
+                 ckpt=args.fine_tuned)
+        else:
+            test(trained=False, model=model, test_loader=test_loader, tokenizer=tokenizer, device=device,
+                 ckpt=None)
+    else:
+        train_and_evaluate(args.num_epochs, tokenizer, model, device, train_loader, eval_loader, optimizer)
+        test(trained=True, model=model, test_loader=test_loader, tokenizer=tokenizer, device=device, ckpt=None)
